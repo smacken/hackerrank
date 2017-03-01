@@ -16,33 +16,36 @@ namespace ConsoleApplication
                 .Split(' ')
                 .Select(x => long.Parse(x))
                 .ToList()
-                .Take(n);
+                .Take(n)
+                .OrderBy(x => x);
 
             // constraints
-            if(n < 1 || n > (int)Math.Pow(10, 5)) 
+            if(n < 1 || n > (long)Math.Pow(10, 5)) 
                 throw new ArgumentException("n");
             var upperArrBounds = (long)Math.Pow(10, 18);
             if(arr.Any(x => x < 1 || x > upperArrBounds)) 
                 throw new ArgumentException("n");
 
-            Func<long, long, bool> isDivisor = (a, b) => { 
-                return (Math.Max(a, b) % Math.Min(a, b)) == 0; 
-            };
+            Func<long, long, bool> isDivisor = (a, b) => { return a % b == 0; };
 
             int commonDivisor = default(int);
-            foreach (var num in Enumerable.Range(1, int.MaxValue)){
-                var divisorMatches = arr.Count(x => isDivisor(num, x));
+            for(var num = 2; num < int.MaxValue; num++){
+                int divisorMatches = 0;
+                int nonMatch = 0;
+                foreach(var i in arr){
+                    // try to bail early knowing we need n-1
+                    if(nonMatch > 1) break;
+                    if(isDivisor(i, num))
+                        divisorMatches++;
+                    else
+                        nonMatch++;
+                }
                 if(divisorMatches == n-1){
                     commonDivisor = num;
                     break;
                 }
             }
             Console.WriteLine(commonDivisor);
-        }
-
-        public static int Divisor(int a, int b)
-        {
-            return b == 0 ? a : Divisor(b, a % b);
         }
     }
 }
